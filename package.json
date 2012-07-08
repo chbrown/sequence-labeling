@@ -1,0 +1,25 @@
+{
+  "name": "classrm",
+  "version": "0.0.1",
+  "homepage": "http://classrm.org/",
+  "repository" : {
+    "type" : "git",
+    "url" : "ssh://dark:/git/classrm.org.git"
+  },
+  "author" : "Christopher Brown <io@henrian.com>",
+  "main" : "classrm.js",
+  "dependencies" : {
+    "amulet": "git://github.com/chbrown/amulet.git",
+    "wrappers": "git://github.com/chbrown/wrappers.git",
+    "cookies": "git://github.com/chbrown/cookies.git",
+    "async": "x.x.x",
+    "csv": "x.x.x",
+    "less": "x.x.x",
+    "mongodb": "x.x.x",
+    "mongoose": "x.x.x",
+    "optimist": "x.x.x",
+    "redis": "x.x.x",
+    "underscore": "x.x.x",
+    "underscore.string": "x.x.x"
+  }
+}
