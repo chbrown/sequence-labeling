@@ -40,6 +40,7 @@
   <div data-mode="teacher">
     <button class="btn save">Save</button>
   </div>
+  <p><br /><br /></p>
 </div>
 
 <script>
@@ -239,17 +240,13 @@ Submission.prototype.annotationsContaining = function(start, end) {
 
 Submission.prototype.layout = function() {
   var self = this, dividers = {0: 1}, indices, segments;
-  // var lookup = {};
   dividers[this.text.length] = 1;
   this.annotations.forEach(function(anno) {
     dividers[anno.start] = 1;
     dividers[anno.end] = 1;
-    // for (var r = anno.start; r < anno.end; r++) {
-    //   lookup[r] = lookup[r] || [];
-    //   lookup[r].push(anno);
-    // }
   });
-  indices = Object.keys(dividers).sort();
+  indices = Object.keys(dividers).map(function(x) { return parseInt(x, 10); });
+  indices = indices.sort(function(a, b) { return a - b; });
   segments = _.zip(indices.slice(0, -1), indices.slice(1));
 
   $('#content .view').empty();
@@ -263,13 +260,7 @@ Submission.prototype.layout = function() {
       $span.css('background-color', anno.color);
     });
     $('#content .view').append($span);
-    // console.log("|" + text_segment + "|");
   });
-  
-
-  // var 
-  // console.log('layoutView', submission);
-
 }
 
 
@@ -300,7 +291,6 @@ Tagset.prototype.refresh = function() {
       if (ev.metaKey)
         self.remove(tag);
       else {
-        // console.log(ev, tag.text);
         submission.addAnnotation(tag.text, tag.color);
       }
     });
