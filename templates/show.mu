@@ -157,7 +157,8 @@ function mouseMove() {
     current_end = end;
     current_text = content.slice(start, end);
 
-    $('#selection').shrinkproof().html(current_text);
+    $('#selection').html(current_text);
+    // .shrinkproof()
   }
   else {
     // sthg else selected
@@ -287,6 +288,7 @@ Tagset.prototype.refresh = function() {
   this.tags.map(function(tag) {
     var $tag = $('<span class="label" style="background-color: ' + tag.color + '">' + tag.text + '</span>');
     self.$container.append($tag);
+    self.$container.append(' ');
     $tag.click(function(ev) {
       if (ev.metaKey)
         self.remove(tag);
