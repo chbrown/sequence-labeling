@@ -172,6 +172,8 @@ function Submission(obj) {
   // initialize text
   $('textarea').change(function() {
     self.text = $(this).val();
+    self.refresh();
+    self.dirty();
   });
   $('button.save').click(function() {
     var $button = $(this);
@@ -219,11 +221,11 @@ Submission.prototype.removeAnnotation = function(annotation) {
   this.dirty();
 };
 Submission.prototype.dirty = function() {
-  $('.fix-right button.save').addClass('btn-inverse');
+  $('button.save').addClass('btn-inverse');
 };
 Submission.prototype.save = function(callback) {
   post('/update/' + this._id, this, callback);
-  $('.fix-right button.save').removeClass('btn-inverse');
+  $('button.save').removeClass('btn-inverse');
 };
 Submission.prototype.annotationsContaining = function(start, end) {
   var containing = [];
