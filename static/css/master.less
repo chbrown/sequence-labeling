@@ -1,14 +1,62 @@
 @import "/static/css/bootstrap.css";
+@import "/static/css/colorjoe.css";
 @import "/static/css/prefixer.less";
 
-body {
-  padding: 10px 10px 10px;
+body { }
+.nowrap { white-space: nowrap; }
+@right: 220px;
+#content {
+  margin-right: @right + 30px;
+  padding: 10px;
+  textarea, .text, .view {
+    width: 100%;
+    height: 400px;
+    padding: 8px;
+    font-size: 140%;
+    line-height: 130%;
+  }
+  .text, .view {
+    white-space: pre-line;
+    overflow: hidden; // keeps the selection-highlight from spanning the page
+    min-height: 20px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    background-color: #FEFDFE;
+    .border-radius(4px);
+    .box-shadow(inset 0 1px 1px rgba(0, 0, 0, 0.05));
+  }
 }
-
-.nowrap {
-  white-space: nowrap;
+#tags {
+  margin-bottom: 10px;
+  .label {
+    cursor: pointer;
+    margin: 0 2px 2px 0;
+  }
 }
-
+#annotations {
+  span {
+    display: inline-block;
+    margin-right: 4px;
+    font-weight: bold;
+  }
+}
+.fix-right {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  height: 100%;
+  width: @right;
+  h3 {
+    margin-top: 10px;
+  }
+}
+.valign {
+  input, button {
+    margin-right: 4px;
+    vertical-align: 0;
+  }
+}
 
 #navbar {
   // height: 32px;

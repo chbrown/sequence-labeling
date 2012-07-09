@@ -26,6 +26,7 @@ amulet.set({minify: true, root: path.join(__dirname, 'templates')});
 
 http.createServer(function(req, res) {
   // req.cookies = new Cookies(req, res);
+  var m;
   req.data = '';
   req.on('data', function(chunk) { req.data += chunk; });
 
@@ -37,11 +38,29 @@ http.createServer(function(req, res) {
       res.end();
     });
   }
+  else if (req.url.match(/\/update\/[a-f0-9]{24}$/)) {
+    m = req.url.match(/\/update\/([a-f0-9]{24})$/);
+    Submission.findById(m[1], function(err, submission) {
+      wrappers.http.waitUntilComplete(req, function() {
+        var payload = JSON.parse(req.data);
+        // console.log('payload', payload);
+        submission.text = payload.text;
+        submission.annotations = payload.annotations;
+        submission.save(function(err) {
+          var result = {success: true, message: 'Saved!' };
+          if (err)
+            result = {success: false, message: 'Error: ' + err.toString() };
+          res.writeHead(200, {"Content-Type": "application/json"});
+          res.end(JSON.stringify(result));
+        });
+      });
+    });
+  }
   else if (req.url.match(/\/[a-f0-9]{24}$/)) {
-    var m = req.url.match(/\/([a-f0-9]{24})$/);
+    m = req.url.match(/\/([a-f0-9]{24})$/);
     Submission.findById(m[1], function(err, submission) {
       res.writeHead(200, {"Content-Type": "text/html"});
-      amulet.render(res, ['layout.mu', 'show.mu']);
+      amulet.render(res, ['layout.mu', 'show.mu'], {submission: submission});
     });
   }
 }).listen(port, host, function() {

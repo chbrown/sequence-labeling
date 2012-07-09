@@ -1,7 +1,17 @@
+// Array Remove - By John Resig (MIT Licensed)
+Array.prototype.remove = function(from, to) {
+  var rest = this.slice((to || from) + 1 || this.length);
+  this.length = from < 0 ? this.length + from : from;
+  return this.push.apply(this, rest);
+};
+
 function post(url, data, callback) {
   if (callback === undefined && typeof data === 'function') {
     callback = data;
     data = undefined;
+  }
+  else if (data !== undefined && typeof(data) !== 'string') {
+    data = JSON.stringify(data);
   }
   $.ajax(url, {
     type: 'POST',
@@ -176,4 +186,24 @@ Widgets.object.prototype.init = function($container, field, value) {
 };
 Widgets.object.prototype.get = function() {
   return this.$select.find('option:selected').val();
+};
+
+function measureBox($target) {
+  return {
+    width: $target.width() +
+      parseInt($target.css('border-left-width'), 10) +
+      parseInt($target.css('border-right-width'), 10) +
+      parseInt($target.css('padding-left'), 10) +
+      parseInt($target.css('padding-right'), 10),
+    height: $target.height() +
+      parseInt($target.css('border-top-width'), 10) +
+      parseInt($target.css('border-bottom-width'), 10) +
+      parseInt($target.css('padding-top'), 10) +
+      parseInt($target.css('padding-bottom'), 10)
+  };
+}
+$.fn.shrinkproof = function() {
+  var dims = measureBox(this);
+  this.css({'min-width': dims.width, 'min-height': dims.height});
+  return this;
 };

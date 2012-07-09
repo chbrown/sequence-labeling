@@ -7,7 +7,8 @@ var SubmissionSchema = new mongoose.Schema({
     start: Number,
     end: Number,
     color: String,
-    text: String
+    text: String,
+    tag: String
   }],
   created: Date
 });
