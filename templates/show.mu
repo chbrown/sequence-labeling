@@ -1,9 +1,9 @@
 <div id="content">
   <h2>Text</h2>
-  <div data-mode="student">
+  <div data-mode="edit">
     <textarea></textarea>
   </div>
-  <div data-mode="teacher">
+  <div data-mode="annotate">
     <div id="view"></div>
   </div>
 </div>
@@ -11,11 +11,11 @@
 <div class="fix-right">
   <h3>Mode</h3>
   <div class="btn-group" id="mode">
-    <button class="btn btn-primary active" data-mode-control="student">Edit</button>
-    <button class="btn btn-success" data-mode-control="teacher">Annotate</button>
+    <button class="btn btn-primary active" data-mode-control="edit">Edit</button>
+    <button class="btn btn-success" data-mode-control="annotate">Annotate</button>
   </div>
 
-  <div data-mode="teacher">
+  <div data-mode="annotate">
     <h3>Selection</h3>
     <div id="selection"></div>
 
@@ -35,9 +35,14 @@
 
   <h3>Help</h3>
   <div id="help">
-    <p>&#8984;+Click an annotation to delete it.
-    <p>&#8984;+Click a tag to delete it.
-    <p>Enter/return to annotate the current selection with the most recent annotation.
+    <div data-mode="edit">
+      <p>Type or paste your submission into the box. It will autosave three seconds after adding new input.</p>
+    </div>
+    <div data-mode="annotate">
+      <p>&#8984;+Click an annotation to delete it.</p>
+      <p>&#8984;+Click a tag to delete it.</p>
+      <p>Enter/return to annotate the current selection with the most recent annotation.</p>
+    </div>
   </div>
 </div>
 
@@ -101,7 +106,7 @@ head.ready(function() {
   $('[data-mode-control]').click(function() {
     changeMode($(this).attr('data-mode-control'));
   });
-  changeMode(localStorage.mode || 'student');
+  changeMode(localStorage.mode || 'edit');
 
   $(document).mousedown(function() {
     mouse_down = true;
