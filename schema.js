@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 mongoose.connect('mongodb://localhost/classrm');
 var SubmissionSchema = new mongoose.Schema({
-  text: String,
+  text: { type: String, default: ''},
   annotations: [{
     start: Number,
     end: Number,
@@ -10,7 +10,7 @@ var SubmissionSchema = new mongoose.Schema({
     text: String,
     tag: String
   }],
-  created: Date
+  created: { type: Date, default: Date.now }
 });
 
 var Submission = mongoose.model('submission', SubmissionSchema);

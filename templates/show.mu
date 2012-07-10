@@ -157,8 +157,8 @@ function attrfy(obj) {
 function Submission(obj) {
   var self = this;
   this._id = obj._id;
-  this.text = obj.text;
-  this.annotations = obj.annotations;
+  this.text = obj.text || '';
+  this.annotations = obj.annotations || [];
 
   // initialize text
   $('textarea').on('change keyup', function() {
