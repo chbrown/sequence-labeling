@@ -106,7 +106,7 @@ head.ready(function() {
   $('[data-mode-control]').click(function() {
     changeMode($(this).attr('data-mode-control'));
   });
-  changeMode(localStorage.mode || 'edit');
+  changeMode(localStorage.mode === 'annotate' ? 'annotate' : 'edit');
 
   $(document).mousedown(function() {
     mouse_down = true;
