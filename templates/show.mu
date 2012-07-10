@@ -1,23 +1,18 @@
 <div id="content">
-  <h2>Text:</h2>
+  <h2>Text</h2>
   <div data-mode="student">
     <textarea></textarea>
-    <button class="btn save">Save</button>
   </div>
   <div data-mode="teacher">
-    <div class="text"></div>
-  </div>
-  <div data-mode="view">
-    <div class="view"></div>
+    <div id="view"></div>
   </div>
 </div>
 
 <div class="fix-right">
   <h3>Mode</h3>
   <div class="btn-group" id="mode">
-    <button class="btn btn-primary active" data-mode-control="student">Student</button>
-    <button class="btn btn-warning" data-mode-control="teacher">Teacher</button>
-    <button class="btn btn-success" data-mode-control="view">View</button>
+    <button class="btn btn-primary active" data-mode-control="student">Edit</button>
+    <button class="btn btn-success" data-mode-control="teacher">Annotate</button>
   </div>
 
   <div data-mode="teacher">
@@ -37,10 +32,13 @@
 
   <h3>Annotations</h3>
   <div id="annotations"></div>
-  <div data-mode="teacher">
-    <button class="btn save">Save</button>
+
+  <h3>Help</h3>
+  <div id="help">
+    <p>&#8984;+Click an annotation to delete it.
+    <p>&#8984;+Click a tag to delete it.
+    <p>Enter/return to annotate the current selection with the most recent annotation.
   </div>
-  <p><br /><br /></p>
 </div>
 
 <script>
@@ -48,7 +46,9 @@ var submission, annotation;
 var mouse_down = false,
   current_start = -1,
   current_end = -1,
-  current_text = '';
+  current_text = '',
+  current_tag = '',
+  current_color = '';
 
 head.ready(function() {
   // initialize tags
@@ -71,8 +71,14 @@ head.ready(function() {
     $('#color_joe').show();
   });
   $('#new_tag button').click(function() {
-    var new_tag = new Tag($('#new_tag .text').val(), $('#new_tag .color').val());
-    tagset.add(new_tag);
+    var text = $('#new_tag .text').val(),
+      color = $('#new_tag .color').val();
+    if (text && color) {
+      tagset.add(new Tag(text, color));
+    }
+    else {
+      $('#new_tag .color').flag({html: 'You must select a color and label.', anchor: 'l', fade: 3000});
+    }
   });
 
   // initialize annotations
@@ -90,9 +96,7 @@ head.ready(function() {
     // init submission values
     localStorage.mode = mode;
 
-    if (mode === 'view') {
-      submission.layout();
-    }
+    submission.layout();
   }
   $('[data-mode-control]').click(function() {
     changeMode($(this).attr('data-mode-control'));
@@ -110,59 +114,44 @@ head.ready(function() {
     mouseMove();
     mouse_down = false;
   }).mousemove(mouseMove);
-
-
-
-  // $('#submit_span').click(function() {
-  //   var copy = $.extend({}, span);
-  //   copy.label = $('#presup_type').val();
-  //   $('#presup_type').val('');
-
-  //   saved_spans.push(copy);
-  //   localStorage.saved_spans = JSON.stringify(saved_spans);
-  //   displaySavedSpans();
-  // });
-  // $('#clear_spans').click(function() {
-  //   saved_spans = [];
-  //   localStorage.saved_spans = JSON.stringify(saved_spans);
-  //   displaySavedSpans();
-  // });
-  // function displaySavedSpans() {
-  //   $('#saved_spans').html(JSON.stringify(saved_spans, null, '&nbsp;').replace(/\n/g, '<br>'));
-  // }
 });
 function mouseMove() {
-  var text_div = $('#content .text')[0],
-      node = text_div.childNodes ? text_div.childNodes[0] : null,
-      selection = document.getSelection();
+  // TODO: account for if the user selects past the end of the box
+  var sel = document.getSelection();
+  if (mouse_down && sel.anchorNode) {
+    var div = sel.anchorNode.parentNode.parentNode;
+    if (div.id === 'view') {
+      var start_span = sel.anchorNode.parentNode,
+        end_span = sel.focusNode.parentNode;
+        edges = [parseInt(start_span.getAttribute('data-start'), 10) + sel.anchorOffset,
+          parseInt(end_span.getAttribute('data-start'), 10) + sel.focusOffset];
+      edges = edges.sort(function(a, b) { return a - b; });
 
-  // account for if the user selects past the end of the box
-  if (mouse_down && node && selection.anchorNode == node && selection.focusNode == node) {
-    var content = node.textContent,
-      start = Math.min(selection.anchorOffset, selection.focusOffset),
-      end = Math.max(selection.anchorOffset, selection.focusOffset);
+      /* NO LEAK
+        // leak to the left of the start point if we started in the middle of a word
+        var before = content.slice(Math.max(start - 16, 0), start + 1);
+        var before_break = before.match(/\b\w+$/)
+        if (before_break)
+          start -= before_break[0].length - 1;
+        // and to the right
+        var after = content.slice(end - 1, end + 16);
+        var after_break = after.match(/^\w+\b/);
+        if (after_break)
+          end += after_break[0].length - 1;
+      */
 
-    // leak to the left of the start point if we started in the middle of a word
-    var before = content.slice(Math.max(start - 16, 0), start + 1);
-    var before_break = before.match(/\b\w+$/)
-    if (before_break)
-      start -= before_break[0].length - 1;
-    // and to the right
-    var after = content.slice(end - 1, end + 16);
-    var after_break = after.match(/^\w+\b/);
-    if (after_break)
-      end += after_break[0].length - 1;
+      current_start = edges[0];
+      current_end = edges[1];
+      current_text = submission.text.slice(current_start, current_end);
 
-    current_start = start;
-    current_end = end;
-    current_text = content.slice(start, end);
-
-    $('#selection').html(current_text);
-    // .shrinkproof()
+      $('#selection').html(current_text);
+    }
   }
-  else {
-    // sthg else selected
-  }
+}
+
+function attrfy(obj) {
+  var attrs = $.map(obj, function(val, key) { return 'data-' + key + '="' + val + '"'; });
+  return attrs.join(' ');
 }
 
 function Submission(obj) {
@@ -172,16 +161,17 @@ function Submission(obj) {
   this.annotations = obj.annotations;
 
   // initialize text
-  $('textarea').change(function() {
+  $('textarea').on('change keyup', function() {
     self.text = $(this).val();
-    self.refresh();
-    self.dirty();
-  });
-  $('button.save').click(function() {
-    var $button = $(this);
-    self.save(function(result) {
-      var $flag = $button.flag({html: result.message, fade: 3000});
+    self.queueSave(function(result) {
+      $('#content textarea').flag({html: result.message, fade: 3000});
     });
+    self.refresh();
+  });
+  $(document).on('keyup', function(ev) {
+    if (ev.which === 13) { // enter key
+      self.addAnnotation(current_tag, current_color);
+    }
   });
 }
 Submission.prototype.refresh = function() {
@@ -198,9 +188,11 @@ Submission.prototype.refresh = function() {
     $('<span>' + anno.tag + '</span>').css('color', anno.color).appendTo($p);
     $p.append(anno.text);
   });
+  this.layout();
 };
 Submission.prototype.addAnnotation = function(tag, color) {
-  if (current_text) {
+  current_tag = tag, current_color = color;
+  if (current_text && tag && color) {
     var anno = {
       start: current_start,
       end: current_end,
@@ -210,24 +202,33 @@ Submission.prototype.addAnnotation = function(tag, color) {
     };
     this.annotations.push(anno);
     this.refresh();
+    this.queueSave(function(result) {
+      $('#tags').flag({anchor: 'l', html: result.message, fade: 3000});
+    });
   }
-  else {
+  else if (!current_text) {
     $('#tags').flag({anchor: 'l', text: "You must select some text", fade: 2000});
-    return;
   }
-  this.dirty();
+  else { // if (!tag || !color)
+    $('#tags').flag({anchor: 'l', text: "You must select an annotation", fade: 2000});
+  }
 };
 Submission.prototype.removeAnnotation = function(annotation) {
   this.annotations.remove(this.annotations.indexOf(annotation));
   this.refresh();
-  this.dirty();
+  this.queueSave(function(result) {
+    $('#tags').flag({anchor: 'l', html: result.message, fade: 3000});
+  });
 };
-Submission.prototype.dirty = function() {
-  $('button.save').addClass('btn-inverse');
-};
-Submission.prototype.save = function(callback) {
-  post('/update/' + this._id, this, callback);
-  $('button.save').removeClass('btn-inverse');
+Submission.prototype.queueSave = function(callback) {
+  var self = this;
+  // queueSave calls the callback if the caller wins a timeout race, otherwise, it never gets called
+  //   callback signature: POST ajaxy result-dict
+  if (this.timeout)
+    clearTimeout(this.timeout);
+  this.timeout = setTimeout(function() {
+    post('/update/' + self._id, self, callback);
+  }, 3000);
 };
 Submission.prototype.annotationsContaining = function(start, end) {
   var containing = [];
@@ -238,7 +239,6 @@ Submission.prototype.annotationsContaining = function(start, end) {
   });
   return containing;
 }
-
 Submission.prototype.layout = function() {
   var self = this, dividers = {0: 1}, indices, segments;
   dividers[this.text.length] = 1;
@@ -250,17 +250,16 @@ Submission.prototype.layout = function() {
   indices = indices.sort(function(a, b) { return a - b; });
   segments = _.zip(indices.slice(0, -1), indices.slice(1));
 
-  $('#content .view').empty();
-  segments.forEach(function(segment) {
+  $('#view').empty();
+  segments.forEach(function(segment, i) {
     var start = segment[0], end = segment[1],
       text_segment = self.text.slice(start, end);
     
-    var $span = $('<span />').text(text_segment);
-    var annos = self.annotationsContaining(start, end);
-    annos.forEach(function(anno) {
+    var $span = $('<span '  + attrfy({start: start, end: end, i: i}) + '">' + text_segment + '</span>');
+    self.annotationsContaining(start, end).forEach(function(anno) {
       $span.css('background-color', anno.color);
     });
-    $('#content .view').append($span);
+    $('#view').append($span);
   });
 }
 
@@ -275,8 +274,20 @@ Tagset.prototype.load = function() {
     this.tags = saved_tags.map(function(tag) { return new Tag(tag.text, tag.color); });
   }
   catch (exc) {
-    console.log("Could not load saved tags, aborting load. " + exc.toString());
-    this.tags = [];
+    if (localStorage.saved_tags === undefined) {
+      // '#330099', '#990099', '#ccff00', '#ff0000'
+      // defaults
+      console.log("No saved tags, loading some defaults");
+      this.tags = [
+        new Tag('Vocab', '#00cc00'),
+        new Tag('Spelling', '#0066b3'),
+        new Tag('Word Choice', '#ff8000'),
+        new Tag('Awkward', '#ffcc00')
+      ];
+    }
+    else {
+      console.log("Could not load saved tags, aborting load. " + exc.toString());
+    }
   }
 };
 Tagset.prototype.save = function() {
@@ -290,8 +301,9 @@ Tagset.prototype.refresh = function() {
     self.$container.append($tag);
     self.$container.append(' ');
     $tag.click(function(ev) {
-      if (ev.metaKey)
+      if (ev.metaKey) {
         self.remove(tag);
+      }
       else {
         submission.addAnnotation(tag.text, tag.color);
       }

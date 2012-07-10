@@ -26,8 +26,6 @@
     this.align = align;
     this.parent = parent;
 
-    this.target_offset = $target.offset(); // { left: 999, top: 999 }
-    this.target_size = $target.measureBox(); // { width: 999, height: 999 }
     this.$flag = $('<div class="flag" style="' + this.flag_style + '"></div>').appendTo(parent).on('click', function() {
       self.remove();
     });
@@ -43,6 +41,9 @@
   Flag.prototype.triangle_style = 'display: inline-block; position: absolute; border: 6px solid transparent; width: 0; height: 0;';
 
   Flag.prototype.redraw = function() {
+    var target_offset = this.$target.offset(), // { left: 999, top: 999 }
+      target_size = this.$target.measureBox(); // { width: 999, height: 999 }
+
     this.$flag.fadeIn(80);
     this.$span.html(this.html);
     var flag_size = this.$flag.measureBox(); // { width: 999, height: 999 }
@@ -51,7 +52,7 @@
       // handle anchoring (left/right)
       if (this.anchor === 'r') {
         this.$flag.css({
-          left: this.target_offset.left + this.target_size.width,
+          left: target_offset.left + target_size.width,
           'margin-left': this.triangle_radius});
         this.$triangle.css({
           left: -this.triangle_radius,
@@ -60,7 +61,7 @@
       }
       else {
         this.$flag.css({
-          left: (this.target_offset.left - flag_size.width) - this.triangle_radius,
+          left: (target_offset.left - flag_size.width) - this.triangle_radius,
           'margin-right': this.triangle_radius
         });
         this.$triangle.css({
@@ -72,16 +73,16 @@
 
       // handle alignment (top/middle/bottom)
       if (this.align === 't') {
-        this.$flag.css('top', this.target_offset.top);
+        this.$flag.css('top', target_offset.top);
       }
       else if (this.align === 'm') {
-        var flag_top = this.target_offset.top +
-          (this.target_size.height / 2.0) -
+        var flag_top = target_offset.top +
+          (target_size.height / 2.0) -
           (flag_size.height / 2.0);
         this.$flag.css('top', flag_top);
       }
       else {
-        this.$flag.css('top', this.target_offset.top + this.target_size.height - flag_size.height);
+        this.$flag.css('top', target_offset.top + target_size.height - flag_size.height);
       }
       this.$triangle.css('top', (flag_size.height - (this.triangle_radius * 2)) / 2);
     }
@@ -92,11 +93,10 @@
 
   $.flag = function(args) {
     if (args === undefined) args = {};
-    var $target = args.element || $(args.selector),
-        update = args.update === undefined ? true : args.update;
+    var $target = args.element || $(args.selector);
 
     var flag = $target.data('flag');
-    if (!update || !flag) {
+    if (args.update === false || !flag) {
       flag = new Flag($target, args.anchor || 'r', args.align || 'm', args.parent || document.body);
     }
     $target.data('flag', flag);
