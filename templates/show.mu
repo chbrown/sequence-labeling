@@ -120,6 +120,7 @@ head.ready(function() {
     mouse_down = false;
   }).mousemove(mouseMove);
 });
+
 function mouseMove() {
   // TODO: account for if the user selects past the end of the box
   var sel = document.getSelection();

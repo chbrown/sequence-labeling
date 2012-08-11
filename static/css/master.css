@@ -1,0 +1,16 @@
+@import "bootstrap.css";
+@import "colorjoe.css";
+.nowrap{white-space:nowrap;}
+#content{margin-right:250px;padding:10px;}#content textarea{height:400px;}
+#content textarea,#content #view{width:100%;padding:8px;font-size:140%;line-height:130%;}
+#content #view{white-space:pre-line;overflow:scroll;min-height:400px;margin-bottom:10px;border:1px solid rgba(0, 0, 0, 0.05);background-color:#FEFDFE;-webkit-border-radius:4px;border-radius:4px;-webkit-background-clip:padding-box;background-clip:padding-box;-webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);}
+#tags{margin-bottom:10px;}#tags .label{display:inline-block;cursor:pointer;margin-bottom:3px;}
+#annotations span{display:inline-block;margin-right:4px;font-weight:bold;}
+.fix-right{position:fixed;top:0;right:0;padding:10px;height:98%;overflow:scroll;width:220px;}.fix-right h3{margin-top:10px;}
+.valign input,.valign button{margin-right:4px;vertical-align:0;}
+#navbar{position:fixed;left:0;top:0;width:100%;background-color:#f5f5f5;background-image:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(100% #eeeeee));background-image:-webkit-linear-gradient(top, #ffffff 0%, #eeeeee 100%);background-image:linear-gradient(top, #ffffff 0%, #eeeeee 100%);border-bottom:1px solid #ddd;z-index:100;}#navbar h1,#navbar h2,#navbar h3{vertical-align:middle;margin:0 10px;display:inline-block;}
+.fileupload-buttonbar input,.fileupload-buttonbar button{vertical-align:top;}
+#dropzone{padding:3px 50px;display:inline-block;}
+#dropzone.in{background:#bbb;}
+#dropzone.hover{background:#999;}
+#dropzone.fade{-webkit-transition:all 0.3s ease-out;transition:all 0.3s ease-out;opacity:1;}
