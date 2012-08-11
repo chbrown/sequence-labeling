@@ -208,7 +208,7 @@ Submission.prototype.addAnnotation = function(tag, color) {
     this.annotations.push(anno);
     this.refresh();
     this.queueSave(function(result) {
-      $('#tags').flag({anchor: 'l', html: result.message, fade: 3000});
+      $('#annotations').flag({anchor: 'l', html: result.message, fade: 3000});
     });
   }
   else if (!current_text) {
@@ -222,7 +222,7 @@ Submission.prototype.removeAnnotation = function(annotation) {
   this.annotations.remove(this.annotations.indexOf(annotation));
   this.refresh();
   this.queueSave(function(result) {
-    $('#tags').flag({anchor: 'l', html: result.message, fade: 3000});
+    $('#annotations').flag({anchor: 'l', html: result.message, fade: 3000});
   });
 };
 Submission.prototype.queueSave = function(callback) {
@@ -271,7 +271,8 @@ Submission.prototype.layout = function() {
 
 function Tagset(tags) {
   this.$container = $('#tags');
-  this.load(); // this.tags = [];
+  this.tags = [];
+  this.load();
 }
 Tagset.prototype.load = function() {
   try {
@@ -279,7 +280,7 @@ Tagset.prototype.load = function() {
     this.tags = saved_tags.map(function(tag) { return new Tag(tag.text, tag.color); });
   }
   catch (exc) {
-    if (localStorage.saved_tags === undefined) {
+    if (!localStorage.saved_tags) {
       // '#330099', '#990099', '#ccff00', '#ff0000'
       // defaults
       console.log("No saved tags, loading some defaults");
