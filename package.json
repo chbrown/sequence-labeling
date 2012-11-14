@@ -1,6 +1,6 @@
 {
   "name": "classrm",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "http://classrm.org/",
   "repository" : {
     "type" : "git",
@@ -12,9 +12,7 @@
     "amulet": "*",
     "wrappers": "git://github.com/chbrown/wrappers.git",
     "async": "*",
-    "csv": "*",
     "mongoose": "*",
-    "optimist": "*",
-    "redis": "*",
+    "optimist": "*"
   }
 }
