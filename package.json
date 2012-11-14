@@ -9,17 +9,12 @@
   "author" : "Christopher Brown <io@henrian.com>",
   "main" : "classrm.js",
   "dependencies" : {
-    "amulet": "git://github.com/chbrown/amulet.git",
+    "amulet": "*",
     "wrappers": "git://github.com/chbrown/wrappers.git",
-    "cookies": "git://github.com/chbrown/cookies.git",
-    "async": "x.x.x",
-    "csv": "x.x.x",
-    "less": "x.x.x",
-    "mongodb": "x.x.x",
-    "mongoose": "x.x.x",
-    "optimist": "x.x.x",
-    "redis": "x.x.x",
-    "underscore": "x.x.x",
-    "underscore.string": "x.x.x"
+    "async": "*",
+    "csv": "*",
+    "mongoose": "*",
+    "optimist": "*",
+    "redis": "*",
   }
 }

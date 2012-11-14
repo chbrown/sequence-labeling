@@ -1,10 +1,7 @@
 #!/usr/bin/env node
-var __ = require('underscore')._,
-    fs = require('fs'),
+var fs = require('fs'),
     path = require('path'),
     http = require('http'),
-    Cookies = require('cookies'),
-    redis = require('redis').createClient(),
     amulet = require('amulet'),
     wrappers = require('wrappers'),
     schema = require('./schema'),
@@ -15,17 +12,9 @@ var __ = require('underscore')._,
 
 amulet.set({minify: true, root: path.join(__dirname, 'templates')});
 
-// Cookies.prototype.defaults = function() {
-//   return {expires: new Date().addDays(31), httpOnly: false};
-// };
-
 // var datetime_format = 'mmmm d, yyyy, h:MM TT';
 
-// render LESS so it doesn't have to in the browser
-// convert.lessToCss('static/css/base.less', 'static/css/base.css');
-
 http.createServer(function(req, res) {
-  // req.cookies = new Cookies(req, res);
   var m;
   req.data = '';
   req.on('data', function(chunk) { req.data += chunk; });
