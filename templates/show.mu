@@ -48,12 +48,12 @@
 
 <script>
 var submission, annotation;
-var mouse_down = false,
-  current_start = -1,
-  current_end = -1,
-  current_text = '',
-  current_tag = '',
-  current_color = '';
+var mouse_down = false;
+var current_start = -1;
+var current_end = -1;
+var current_text = '';
+var current_tag = '';
+var current_color = '';
 
 head.ready(function() {
   // initialize tags
@@ -87,7 +87,7 @@ head.ready(function() {
   });
 
   // initialize annotations
-  submission = new Submission({{{submission | JSON.stringify}}});
+  submission = new Submission({{{JSON.stringify(submission)}}});
   submission.refresh();
 
   // initialize mode of UI
@@ -150,7 +150,9 @@ function mouseMove() {
       current_end = edges[1];
       current_text = submission.text.slice(current_start, current_end);
 
-      $('#selection').html(current_text);
+      var $selection = $('#selection');
+      // $selection.css('min-height', $selection.height())
+      $selection.html(current_text);
     }
   }
 }
@@ -230,11 +232,12 @@ Submission.prototype.queueSave = function(callback) {
   var self = this;
   // queueSave calls the callback if the caller wins a timeout race, otherwise, it never gets called
   //   callback signature: POST ajaxy result-dict
-  if (this.timeout)
+  if (this.timeout) {
     clearTimeout(this.timeout);
+  }
   this.timeout = setTimeout(function() {
     post('/update/' + self._id, self, callback);
-  }, 3000);
+  }, 1500);
 };
 Submission.prototype.annotationsContaining = function(start, end) {
   var containing = [];
@@ -260,7 +263,7 @@ Submission.prototype.layout = function() {
   segments.forEach(function(segment, i) {
     var start = segment[0], end = segment[1],
       text_segment = self.text.slice(start, end);
-    
+
     var $span = $('<span '  + attrfy({start: start, end: end, i: i}) + '">' + text_segment + '</span>');
     self.annotationsContaining(start, end).forEach(function(anno) {
       $span.css('background-color', anno.color);

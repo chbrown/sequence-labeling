@@ -1,57 +1,74 @@
 #!/usr/bin/env node
-var fs = require('fs'),
-    path = require('path'),
-    http = require('http'),
-    amulet = require('amulet'),
-    wrappers = require('wrappers'),
-    schema = require('./schema'),
-    Submission = schema.Submission,
-    argv = require('optimist').argv,
-    host = argv.host || '127.0.0.1',
-    port = argv.port || 4505;
+'use strict'; /*jslint node: true, es5: true, indent: 2 */
+var fs = require('fs');
+var path = require('path');
+var http = require('http-enhanced');
+var amulet = require('amulet');
+var logger = require('winston');
+var Router = require('regex-router');
+var _ = require('underscore');
+var Submission = require('./schema').Submission;
+var argv = require('optimist').default({port: 4505, hostname: '127.0.0.1'}).argv;
 
 amulet.set({minify: true, root: path.join(__dirname, 'templates')});
 
-// var datetime_format = 'mmmm d, yyyy, h:MM TT';
-
-http.createServer(function(req, res) {
-  var m;
-  req.data = '';
-  req.on('data', function(chunk) { req.data += chunk; });
-
-  console.log(req.url);
-  if (req.url === '/') {
-    var blank = new Submission({created: new Date()});
-    blank.save(function(err) {
-      res.writeHead(302, {Location: '/' + blank._id});
-      res.end();
-    });
+function parseJSON(string, callback) {
+  try {
+    return callback(null, JSON.parse(string));
   }
-  else if (req.url.match(/\/update\/[a-f0-9]{24}$/)) {
-    m = req.url.match(/\/update\/([a-f0-9]{24})$/);
-    Submission.findById(m[1], function(err, submission) {
-      wrappers.http.waitUntilComplete(req, function() {
-        var payload = JSON.parse(req.data);
-        // console.log('payload', payload);
-        submission.text = payload.text;
-        submission.annotations = payload.annotations;
+  catch (exc) {
+    return callback(exc);
+  }
+}
+
+
+var R = new Router();
+
+R.get(/^\/favicon.ico/, function(m, req, res) {
+  res.writeHead(404);
+  res.end();
+});
+
+R.post(/\/update\/([a-f0-9]{24})$/, function(m, req, res) {
+  Submission.findById(m[1], function(err, submission) {
+    req.readToEnd('utf8', function(err, string) {
+      if (err) res.die(err.toString());
+      parseJSON(string, function(err, attrs) {
+        if (err) res.die(err.toString());
+        submission.text = attrs.text;
+        submission.annotations = attrs.annotations;
         submission.save(function(err) {
-          var result = {success: true, message: 'Saved!' };
-          if (err)
-            result = {success: false, message: 'Error: ' + err.toString() };
-          res.writeHead(200, {"Content-Type": "application/json"});
-          res.end(JSON.stringify(result));
+          if (err) res.die(err.toString());
+          res.json({success: true, message: 'Saved!'});
         });
       });
     });
-  }
-  else if (req.url.match(/\/[a-f0-9]{24}$/)) {
-    m = req.url.match(/\/([a-f0-9]{24})$/);
-    Submission.findById(m[1], function(err, submission) {
-      res.writeHead(200, {"Content-Type": "text/html"});
-      amulet.render(res, ['layout.mu', 'show.mu'], {submission: submission});
-    });
-  }
-}).listen(port, host, function() {
-  console.log(__filename + ' server running on ' + host + ':' + port);
+  });
+});
+
+R.get(/\/([a-f0-9]{24})$/, function(m, req, res) {
+  Submission.findById(m[1], function(err, submission) {
+    res.writeHead(200, {"Content-Type": "text/html"});
+    amulet.stream(['layout.mu', 'show.mu'], {submission: submission}).pipe(res);
+  });
+});
+
+R.default = function(m, req, res) {
+  var blank = new Submission();
+  blank.save(function(err) {
+    if (err) logger.error(err);
+    res.redirect('/' + blank._id);
+  });
+};
+
+// attach independent routes
+http.createServer(function(req, res) {
+  var started = Date.now();
+  res.on('finish', function() {
+    logger.info('duration', {url: req.url, method: req.method, ms: Date.now() - started});
+  });
+
+  R.route(req, res);
+}).listen(argv.port, argv.hostname, function() {
+  logger.info(__filename + ' server running at ' + argv.hostname + ':' + argv.port);
 });

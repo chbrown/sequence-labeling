@@ -2,17 +2,27 @@
   "name": "classrm",
   "version": "0.0.2",
   "homepage": "http://classrm.org/",
-  "repository" : {
-    "type" : "git",
-    "url" : "ssh://dark:/git/classrm.org.git"
+  "repository": {
+    "type": "git",
+    "url": "ssh://dark:/git/classrm.org.git"
   },
-  "author" : "Christopher Brown <io@henrian.com>",
-  "main" : "classrm.js",
-  "dependencies" : {
-    "amulet": "*",
-    "wrappers": "git://github.com/chbrown/wrappers.git",
+  "author": "Christopher Brown <io@henrian.com>",
+  "main": "classrm.js",
+  "dependencies": {
+    "amulet": "~0.3",
     "async": "*",
+    "cookies": "git://github.com/chbrown/cookies.git",
+    "http-enhanced": "~0.3",
     "mongoose": "*",
-    "optimist": "*"
-  }
+    "optimist": "~0.5",
+    "regex-router": "*",
+    "underscore": "*",
+    "winston": "~0.6"
+  },
+  "staticDependencies": {
+    "underscore": "*",
+    "jquery": "*",
+    "jquery.tablesorter": "*"
+  },
+  "staticPattern": "static/lib/{resource}/{file}"
 }
