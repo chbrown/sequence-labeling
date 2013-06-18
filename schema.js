@@ -1,8 +1,9 @@
+'use strict'; /*jslint node: true, es5: true, indent: 2 */
 var mongoose = require('mongoose');
+var db = mongoose.createConnection('localhost', 'classrm');
 
-mongoose.connect('mongodb://localhost/classrm');
 var SubmissionSchema = new mongoose.Schema({
-  text: { type: String, default: ''},
+  text: { 'type': String, 'default': ''},
   annotations: [{
     start: Number,
     end: Number,
@@ -10,9 +11,7 @@ var SubmissionSchema = new mongoose.Schema({
     text: String,
     tag: String
   }],
-  created: { type: Date, default: Date.now }
+  created: { 'type': Date, 'default': Date.now }
 });
 
-var Submission = mongoose.model('submission', SubmissionSchema);
-
-exports.Submission = Submission;
+var Submission = exports.Submission = db.model('submission', SubmissionSchema);
