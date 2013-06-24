@@ -1,28 +1,35 @@
 {
-  "name": "classrm",
+  "name": "sequence-labeling",
   "version": "0.0.2",
-  "homepage": "http://classrm.org/",
+  "description": "Web UI for textual sequence labeling",
+  "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
+  "license": "MIT",
+  "keywords": [
+    "web",
+    "app",
+    "ui",
+    "sequence",
+    "labeling",
+    "javascript",
+    "client-side"
+  ],
+  "homepage": "http://classrm.org",
   "repository": {
     "type": "git",
-    "url": "ssh://dark:/git/classrm.org.git"
+    "url": "git://github.com/chbrown/sequence-labeling.git"
   },
-  "author": "Christopher Brown <io@henrian.com>",
-  "main": "classrm.js",
   "dependencies": {
     "amulet": "~0.3",
-    "async": "*",
-    "cookies": "git://github.com/chbrown/cookies.git",
     "http-enhanced": "~0.3",
     "mongoose": "*",
     "optimist": "~0.5",
     "regex-router": "*",
-    "underscore": "*",
     "winston": "~0.6"
   },
   "staticDependencies": {
     "underscore": "*",
     "jquery": "*",
-    "jquery.tablesorter": "*"
+    "jquery-tablesorter": "*"
   },
   "staticPattern": "static/lib/{resource}/{file}"
 }

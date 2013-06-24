@@ -2,7 +2,7 @@
 <link rel="Shortcut Icon" href="/static/favicon.ico">
 <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 <link rel="stylesheet" type="text/css" href="/static/master.css">
-<title>Classrm</title>
+<title>Sequence Labeling</title>
 <script src="/static/lib/js/head.js"></script>
 <div id="container">
   {{<}}

@@ -36,7 +36,7 @@
   <h3>Help</h3>
   <div id="help">
     <div data-mode="edit">
-      <p>Type or paste your submission into the box. It will autosave three seconds after adding new input.</p>
+      <p>Type or paste your text into the box. It will autosave three seconds after adding new input.</p>
     </div>
     <div data-mode="annotate">
       <p>&#8984;+Click an annotation to delete it.</p>
@@ -47,7 +47,8 @@
 </div>
 
 <script>
-var submission, annotation;
+var text_document;
+var annotation;
 var mouse_down = false;
 var current_start = -1;
 var current_end = -1;
@@ -87,8 +88,8 @@ head.ready(function() {
   });
 
   // initialize annotations
-  submission = new Submission({{{JSON.stringify(submission)}}});
-  submission.refresh();
+  text_document = new TextDocument({{{JSON.stringify(text_document)}}});
+  text_document.refresh();
 
   // initialize mode of UI
   function changeMode(mode) {
@@ -98,10 +99,10 @@ head.ready(function() {
     $data_mode.filter('[data-mode~="' + mode + '"]').show();
     $data_mode.not('[data-mode~="' + mode + '"]').hide();
 
-    // init submission values
+    // init text document values
     localStorage.mode = mode;
 
-    submission.layout();
+    text_document.layout();
   }
   $('[data-mode-control]').click(function() {
     changeMode($(this).attr('data-mode-control'));
@@ -127,10 +128,11 @@ function mouseMove() {
   if (mouse_down && sel.anchorNode) {
     var div = sel.anchorNode.parentNode.parentNode;
     if (div.id === 'view') {
-      var start_span = sel.anchorNode.parentNode,
-        end_span = sel.focusNode.parentNode;
-        edges = [parseInt(start_span.getAttribute('data-start'), 10) + sel.anchorOffset,
-          parseInt(end_span.getAttribute('data-start'), 10) + sel.focusOffset];
+      var start_span = sel.anchorNode.parentNode;
+      var end_span = sel.focusNode.parentNode;
+      var edges = [
+        parseInt(start_span.getAttribute('data-start'), 10) + sel.anchorOffset,
+        parseInt(end_span.getAttribute('data-start'), 10) + sel.focusOffset];
       edges = edges.sort(function(a, b) { return a - b; });
 
       /* NO LEAK
@@ -148,7 +150,7 @@ function mouseMove() {
 
       current_start = edges[0];
       current_end = edges[1];
-      current_text = submission.text.slice(current_start, current_end);
+      current_text = text_document.text.slice(current_start, current_end);
 
       var $selection = $('#selection');
       // $selection.css('min-height', $selection.height())
@@ -162,7 +164,7 @@ function attrfy(obj) {
   return attrs.join(' ');
 }
 
-function Submission(obj) {
+function TextDocument(obj) {
   var self = this;
   this._id = obj._id;
   this.text = obj.text || '';
@@ -182,7 +184,7 @@ function Submission(obj) {
     }
   });
 }
-Submission.prototype.refresh = function() {
+TextDocument.prototype.refresh = function() {
   var self = this;
   $('textarea').val(this.text);
   $('#content .text').html(this.text);
@@ -198,7 +200,7 @@ Submission.prototype.refresh = function() {
   });
   this.layout();
 };
-Submission.prototype.addAnnotation = function(tag, color) {
+TextDocument.prototype.addAnnotation = function(tag, color) {
   current_tag = tag, current_color = color;
   if (current_text && tag && color) {
     var anno = {
@@ -221,14 +223,14 @@ Submission.prototype.addAnnotation = function(tag, color) {
     $('#tags').flag({anchor: 'l', text: "You must select an annotation", fade: 2000});
   }
 };
-Submission.prototype.removeAnnotation = function(annotation) {
+TextDocument.prototype.removeAnnotation = function(annotation) {
   this.annotations.remove(this.annotations.indexOf(annotation));
   this.refresh();
   this.queueSave(function(result) {
     $('#annotations').flag({anchor: 'l', html: result.message, fade: 3000});
   });
 };
-Submission.prototype.queueSave = function(callback) {
+TextDocument.prototype.queueSave = function(callback) {
   var self = this;
   // queueSave calls the callback if the caller wins a timeout race, otherwise, it never gets called
   //   callback signature: POST ajaxy result-dict
@@ -239,7 +241,7 @@ Submission.prototype.queueSave = function(callback) {
     post('/update/' + self._id, self, callback);
   }, 1500);
 };
-Submission.prototype.annotationsContaining = function(start, end) {
+TextDocument.prototype.annotationsContaining = function(start, end) {
   var containing = [];
   this.annotations.forEach(function(anno) {
     if (anno.start <= start && anno.end >= end) {
@@ -248,7 +250,7 @@ Submission.prototype.annotationsContaining = function(start, end) {
   });
   return containing;
 }
-Submission.prototype.layout = function() {
+TextDocument.prototype.layout = function() {
   var self = this, dividers = {0: 1}, indices, segments;
   dividers[this.text.length] = 1;
   this.annotations.forEach(function(anno) {
@@ -315,7 +317,7 @@ Tagset.prototype.refresh = function() {
         self.remove(tag);
       }
       else {
-        submission.addAnnotation(tag.text, tag.color);
+        text_document.addAnnotation(tag.text, tag.color);
       }
     });
   })

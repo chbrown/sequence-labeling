@@ -6,7 +6,7 @@ var http = require('http-enhanced');
 var amulet = require('amulet');
 var logger = require('winston');
 var Router = require('regex-router');
-var Submission = require('./models').Submission;
+var models = require('./models');
 var argv = require('optimist').default({
   port: 4505,
   hostname: '127.0.0.1'
@@ -32,16 +32,16 @@ R.get(/^\/favicon.ico/, function(m, req, res) {
   res.end();
 });
 
-// POST /update/:submission_id -> update existing submission
+// POST /update/:document_id -> update existing text document
 R.post(/\/update\/([a-f0-9]{24})$/, function(m, req, res) {
-  Submission.findById(m[1], function(err, submission) {
+  models.TextDocument.findById(m[1], function(err, text_document) {
     req.readToEnd('utf8', function(err, string) {
       if (err) res.die(err.toString());
       parseJSON(string, function(err, attrs) {
         if (err) res.die(err.toString());
-        submission.text = attrs.text;
-        submission.annotations = attrs.annotations;
-        submission.save(function(err) {
+        text_document.text = attrs.text;
+        text_document.annotations = attrs.annotations;
+        text_document.save(function(err) {
           if (err) res.die(err.toString());
           res.json({success: true, message: 'Saved!'});
         });
@@ -50,17 +50,17 @@ R.post(/\/update\/([a-f0-9]{24})$/, function(m, req, res) {
   });
 });
 
-// GET /:submission_id -> retrieve submission
+// GET /:document_id -> retrieve existing text document
 R.get(/\/([a-f0-9]{24})$/, function(m, req, res) {
-  Submission.findById(m[1], function(err, submission) {
+  models.TextDocument.findById(m[1], function(err, text_document) {
     res.writeHead(200, {"Content-Type": "text/html"});
-    amulet.stream(['layout.mu', 'show.mu'], {submission: submission}).pipe(res);
+    amulet.stream(['layout.mu', 'show.mu'], {text_document: text_document}).pipe(res);
   });
 });
 
-// GET / -> create a new submission and redirect to its own page
+// GET / -> create a new text document and redirect to its own page
 R.default = function(m, req, res) {
-  var blank = new Submission();
+  var blank = new models.TextDocument();
   blank.save(function(err) {
     if (err) logger.error(err);
     res.redirect('/' + blank._id);
