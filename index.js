@@ -6,9 +6,11 @@ var http = require('http-enhanced');
 var amulet = require('amulet');
 var logger = require('winston');
 var Router = require('regex-router');
-var _ = require('underscore');
-var Submission = require('./schema').Submission;
-var argv = require('optimist').default({port: 4505, hostname: '127.0.0.1'}).argv;
+var Submission = require('./models').Submission;
+var argv = require('optimist').default({
+  port: 4505,
+  hostname: '127.0.0.1'
+}).argv;
 
 amulet.set({minify: true, root: path.join(__dirname, 'templates')});
 
@@ -24,11 +26,13 @@ function parseJSON(string, callback) {
 
 var R = new Router();
 
+// GET /favicon.ico -> favicon deadend (for chrome inference)
 R.get(/^\/favicon.ico/, function(m, req, res) {
   res.writeHead(404);
   res.end();
 });
 
+// POST /update/:submission_id -> update existing submission
 R.post(/\/update\/([a-f0-9]{24})$/, function(m, req, res) {
   Submission.findById(m[1], function(err, submission) {
     req.readToEnd('utf8', function(err, string) {
@@ -46,6 +50,7 @@ R.post(/\/update\/([a-f0-9]{24})$/, function(m, req, res) {
   });
 });
 
+// GET /:submission_id -> retrieve submission
 R.get(/\/([a-f0-9]{24})$/, function(m, req, res) {
   Submission.findById(m[1], function(err, submission) {
     res.writeHead(200, {"Content-Type": "text/html"});
@@ -53,6 +58,7 @@ R.get(/\/([a-f0-9]{24})$/, function(m, req, res) {
   });
 });
 
+// GET / -> create a new submission and redirect to its own page
 R.default = function(m, req, res) {
   var blank = new Submission();
   blank.save(function(err) {
@@ -61,7 +67,6 @@ R.default = function(m, req, res) {
   });
 };
 
-// attach independent routes
 http.createServer(function(req, res) {
   var started = Date.now();
   res.on('finish', function() {
@@ -70,5 +75,5 @@ http.createServer(function(req, res) {
 
   R.route(req, res);
 }).listen(argv.port, argv.hostname, function() {
-  logger.info(__filename + ' server running at ' + argv.hostname + ':' + argv.port);
+  logger.info('sequence-labeling server running at ' + argv.hostname + ':' + argv.port);
 });
