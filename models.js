@@ -2,8 +2,9 @@
 var mongoose = require('mongoose');
 var db = mongoose.createConnection('localhost', 'classrm');
 
-var SubmissionSchema = new mongoose.Schema({
+var submissionSchema = new mongoose.Schema({
   text: { 'type': String, 'default': ''},
+  created: { 'type': Date, 'default': Date.now },
   annotations: [{
     start: Number,
     end: Number,
@@ -11,7 +12,6 @@ var SubmissionSchema = new mongoose.Schema({
     text: String,
     tag: String
   }],
-  created: { 'type': Date, 'default': Date.now }
 });
 
-var Submission = exports.Submission = db.model('submission', SubmissionSchema);
+exports.Submission = db.model('submission', submissionSchema);
