@@ -1,6 +1,6 @@
 {
   "name": "sequence-labeling",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Web UI for textual sequence labeling",
   "author": "Christopher Brown <io@henrian.com> (http://henrian.com)",
   "license": "MIT",
