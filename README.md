@@ -7,6 +7,8 @@ The demo uses a MongoDB backend for the database.
 
 Highlights and annotation UI are all client-side, in [site.js](static/site.js).
 
+(Previously known as `confrm.org`.)
+
 ## Deployment
 
 Install locally:
