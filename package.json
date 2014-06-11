@@ -19,12 +19,12 @@
     "url": "git://github.com/chbrown/sequence-labeling.git"
   },
   "dependencies": {
-    "amulet": "~0.3",
-    "http-enhanced": "~0.3",
+    "amulet": "*",
+    "http-enhanced": "*",
+    "loge": "*",
     "mongoose": "*",
-    "optimist": "~0.5",
-    "regex-router": "*",
-    "winston": "~0.6"
+    "optimist": "*",
+    "regex-router": "*"
   },
   "staticDependencies": {
     "underscore": "*",
